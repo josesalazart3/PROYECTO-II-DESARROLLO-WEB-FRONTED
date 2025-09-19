@@ -1,0 +1,821 @@
+/* You can add global styles to this file, and also import other style files */
+/* =========================================================
+   BASE / VARIABLES / RESETEO
+   ========================================================= */
+:root{  
+  --bg:#0f1226; --bg-2:#171a36; --panel:#11142b; --card:#0e1134;
+  --text:#e8ebff; --muted:#a7b0d8; --accent:#7c9eff; --accent-2:#20e3b2; --danger:#ff4976;
+  --teamA:#ff8a00; --teamB:#00d1ff;
+  --radius:16px; --gap:16px; --shadow:0 10px 25px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--text);
+  color-scheme: dark;
+
+  background: var(--bg);
+}
+
+/* =========================================================
+   LAYOUT GENERAL (COMPARTIDO)
+   ========================================================= */
+.app{
+  max-width:1200px;
+  margin:32px auto;
+  padding:0 16px;
+  display:grid;
+  grid-template-columns:2fr 1.2fr;
+  gap:var(--gap);
+}
+@media (max-width:990px){
+  .app{grid-template-columns:1fr}
+}
+
+.card{
+  background:linear-gradient(180deg,var(--card),var(--panel));
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  position:relative;
+}
+
+.header{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);
+  background:linear-gradient(90deg,rgba(255,255,255,.04),transparent);
+}
+.header h3{margin:0;font-size:18px;letter-spacing:.4px}
+.badge{background:rgba(255,255,255,.08);color:var(--text);padding:6px 10px;border-radius:999px;font-size:12px}
+
+/* =========================================================
+   [VISOR] BLOQUES PRINCIPALES DEL MARCADOR
+   ========================================================= */
+.scoreboard{padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.team{
+  padding:18px;border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+  border:1px dashed rgba(255,255,255,.08);
+  display:grid;grid-template-rows:auto 1fr auto;gap:10px
+}
+.team .name{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}
+.team .dot{width:12px;height:12px;border-radius:999px;box-shadow:0 0 0 3px rgba(255,255,255,.06) inset}
+.team.local .dot{background:var(--teamA)} .team.visitante .dot{background:var(--teamB)}
+.score{font-weight:800;font-size:clamp(48px,8vw,82px);line-height:1;text-align:center;margin:6px 0 2px;letter-spacing:1px;text-shadow:0 8px 25px rgba(0,0,0,.35)}
+.substats{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:13px}
+.substats span b{color:var(--text)}
+.center{grid-column:1 / -1;display:grid;gap:12px;padding:10px 12px 2px}
+.timer{display:flex;align-items:center;justify-content:center;gap:10px}
+.time{
+  font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:1px;
+  font-size:clamp(36px,6vw,56px);padding:6px 16px;border-radius:12px;
+  background:linear-gradient(180deg,#121640,#0d1233);border:1px solid rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)
+}
+.pill{
+  font-size:12px;text-transform:uppercase;letter-spacing:.8px;
+  padding:6px 10px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(124,158,255,.25),rgba(124,158,255,.05));
+  border:1px solid rgba(124,158,255,.45);color:#dfe7ff
+}
+.progress{height:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.06);position:relative}
+.progress>i{position:absolute;inset:0;width:62%;background:linear-gradient(90deg,var(--accent-2),var(--accent));box-shadow:0 5px 16px rgba(32,227,178,.25)}
+
+/* =========================================================
+   [CONTROL] PANEL DE CONTROL
+   ========================================================= */
+.panel{
+  display:grid;
+  gap:var(--gap);
+  padding:18px;
+  overflow:auto;
+  position:relative;
+  grid-auto-rows:min-content;
+  align-content:start;
+  padding-bottom:12px;
+  scrollbar-gutter: stable both-edges;
+  -webkit-overflow-scrolling: touch;
+}
+.section{
+  border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01))
+}
+.section h4{margin:0 0 10px;font-size:14px;letter-spacing:.6px;text-transform:uppercase;color:#cfd6ff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* “Control General” sticky al fondo */
+.section:last-of-type{
+  position:sticky;
+  bottom:0;
+  z-index:20;
+  margin-top:8px;
+  background: linear-gradient(180deg, rgba(17,20,43,.92), rgba(14,17,52,.96));
+  box-shadow: 0 -8px 24px rgba(0,0,0,.25), 0 0 0 1px rgba(255,255,255,.06) inset;
+  backdrop-filter: blur(4px);
+}
+
+.btn{
+  appearance:none;border:none;cursor:pointer;padding:10px 14px;border-radius:10px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+  color:var(--text);font-weight:600;border:1px solid rgba(255,255,255,.1);
+  transition:.15s transform ease,.15s filter ease,.15s background ease
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn.primary{background:linear-gradient(180deg,var(--accent),#5e7efc)}
+.btn.success{background:linear-gradient(180deg,var(--accent-2),#11caa0)}
+.btn.danger{background:linear-gradient(180deg,#ff6d97,var(--danger))}
+.btn.subtle{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))}
+.pill-mini{padding:6px 10px;border-radius:999px;font-size:12px;background:rgba(255,255,255,.06);color:#d7dcff;border:1px solid rgba(255,255,255,.09)}
+.teamA{border-color:rgba(255,138,0,.4)!important;background:linear-gradient(180deg,#ff8a0022,#ff8a000a)!important}
+.teamB{border-color:rgba(0,209,255,.4)!important;background:linear-gradient(180deg,#00d1ff22,#00d1ff0a)!important}
+
+/* ===== Selects oscuros con flecha ===== */
+.select{ position:relative; display:inline-block; width:100% }
+.sel{
+  appearance:none; -webkit-appearance:none; -moz-appearance:none;
+  min-width:220px;
+  padding:10px 36px 10px 12px;
+  border-radius:10px;
+  color:var(--text);
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+  width:100%; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
+}
+.select::after{
+  content:"▾";
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  pointer-events:none; font-weight:800; color:var(--muted);
+}
+.sel:hover{ filter:brightness(1.05) }
+.sel:focus{
+  outline:none;
+  border-color:rgba(124,158,255,.55);
+  box-shadow:0 0 0 2px rgba(124,158,255,.35);
+}
+.sel:disabled{ opacity:.6; cursor:not-allowed }
+
+/* ===== Toggle sonido ===== */
+.toggle{display:inline-flex;align-items:center;gap:8px}
+.toggle input{display:none}
+.toggle .ui{
+  width:36px;height:20px;border-radius:999px;background:rgba(255,255,255,.15);
+  position:relative;transition:.15s
+}
+.toggle .ui::after{
+  content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.15s
+}
+.toggle input:checked + .ui{background:linear-gradient(180deg,var(--accent-2),var(--accent))}
+.toggle input:checked + .ui::after{left:18px}
+
+/* ===== Decoración ===== */
+.glow{position:absolute;filter:blur(45px);opacity:.35;mix-blend-mode:screen}
+.g1{width:220px;height:220px;background:var(--teamA);top:-60px;left:-60px}
+.g2{width:220px;height:220px;background:var(--teamB);bottom:-60px;right:-60px}
+
+/* =========================================================
+   [VISOR] LATERALES DE FALTAS Y GRID DEL VISOR
+   ========================================================= */
+.app-visor{grid-template-columns:280px 1fr 280px}
+@media (max-width:1100px){.app-visor{grid-template-columns:240px 1fr 240px}}
+@media (max-width:900px){
+  .app-visor{grid-template-columns:1fr}
+  .left{order:1}.center-card{order:2}.right{order:3}
+}
+.side{position:relative}
+.roster{display:grid;gap:10px;padding:14px}
+.foul-item{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.06);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02))
+}
+.foul-item .who{display:flex;align-items:center;gap:10px;min-width:0}
+.avatar{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;font-weight:800;font-size:12px;color:#0b0f2e}
+.avatar.home{background:var(--teamA)} .avatar.away{background:var(--teamB);color:#06283d}
+.name{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.count{font-weight:700;font-size:13px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}
+.count.warn{background:linear-gradient(180deg,#ffd36a33,#ffd36a1a);border-color:#ffd36a66}
+.count.danger{background:linear-gradient(180deg,#ff6d9733,#ff6d971a);border-color:#ff6d9766}
+
+/* =========================================================
+   [CONTROL] Colapsables “Fuera por 5”
+   ========================================================= */
+.collapse {
+  border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:10px 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+}
+.collapse > summary {
+  list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+  font-weight:600; padding:6px 4px; color:var(--text);
+}
+.collapse > summary::-webkit-details-marker { display:none }
+.caret { transition: transform .15s ease }
+.collapse[open] .caret { transform: rotate(180deg) }
+.out-list { list-style:none; margin:8px 0 0; padding:0; display:grid; gap:8px }
+.out-list{
+  max-height: clamp(140px, 28vh, 240px);
+  overflow:auto;
+  padding-right:6px;
+  scroll-behavior:smooth;
+}
+.out-item { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text) }
+.out-item.muted { color: var(--muted) }
+.tag {
+  display:inline-block; min-width:28px; text-align:center; font-weight:800; font-size:12px; padding:4px 8px; border-radius:999px;
+  background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12)
+}
+
+/* =========================================================
+   FIX: estabilizar select “Jugador (dorsal)”
+   ========================================================= */
+.row .select{ flex: 0 0 260px; min-width: 260px; }
+.sel{ width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+html{ scrollbar-gutter: stable both-edges; }
+
+/* =========================================================
+   FIX: títulos fijos en “Fuera por 5”
+   ========================================================= */
+.row.foul-outs{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:16px;
+  width:100%;
+  align-items:flex-start;
+  margin-top:12px;
+}
+.outbox{ width:100%; }
+.outbox > summary{
+  min-height:36px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+
+/* =========================================================
+   Centrar SOLO la vista de Control (no afecta VISOR)
+   ========================================================= */
+.app:not(.app-visor){
+  min-height: 100vh;
+}
+.app:not(.app-visor) > .card{
+  grid-column: 1 / -1;
+  place-self: center;
+}
+
+/* Z-order seguro para header/panel sobre decoraciones */
+.card .header, .card .panel { position: relative; z-index: 2; }
+.card .glow { position: absolute; z-index: 1; }
+
+/* =========================================================
+   LATERALES FIJOS + MODO RESPONSIVO
+   ========================================================= */
+.sidecard{
+  position:fixed;
+  top:80px;
+  width:295px;
+  background:linear-gradient(180deg,var(--card),var(--panel));
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:16px;
+  box-shadow: var(--shadow);
+  padding:12px 12px 14px;
+  z-index:5;
+}
+.sidecard-left{ left:24px; }
+.sidecard-right{ right:24px; }
+
+.sidecard-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 8px 8px; border-bottom:1px solid rgba(255,255,255,.06);
+}
+.sidecard-head h3{ margin:0; font-size:16px; letter-spacing:.4px }
+
+.sidecard-body{ display:grid; gap:10px; padding:10px 4px 0 }
+.field{ display:grid; gap:6px }
+.field.mini{ width:120px }
+.field > span{ font-size:11px; letter-spacing:.6px; color:#cfd6ff }
+.input{
+  height:36px; padding:8px 10px; border-radius:10px;
+  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+  color:var(--text);
+}
+.colorpick{
+  width:100%; height:36px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
+  background:transparent; padding:0;
+}
+.row.between{ justify-content:space-between; gap:10px }
+.btn.block{ width:100% }
+
+.sidecard .shelf{
+  position:absolute; left:50%; transform:translateX(-50%);
+  bottom:-10px; width:85%; height:4px; border-radius:999px;
+  background: rgba(0,0,0,.45); filter: blur(6px); opacity:.8;
+}
+
+/* Ajustes en pantallas muy anchas (suave) */
+@media (max-width: 1400px){
+  .sidecard{ transform: scale(.95); opacity:.98 }
+}
+
+/* ---------- Modo apilado (tablets y móviles) ---------- */
+@media (max-width:1260px){
+  /* Los laterales ya NO son fijos: entran al flujo y se apilan */
+  .sidecard{
+    position:static;
+    width:auto;
+    max-width:860px;
+    margin:0 auto 16px;
+    transform:none;
+    z-index:auto;
+  }
+  .sidecard-left,.sidecard-right{ left:auto; right:auto }
+
+  /* Inputs en dos columnas cuando quepa */
+  .sidecard .row.between{ flex-wrap:wrap }
+  .sidecard .field.mini{ width:calc(50% - 6px) }
+
+  /* El select ocupa todo el ancho cómodo */
+  .sidecard .select{ width:100% }
+}
+
+/* Teléfonos: tipografía y paddings un pelito más compactos */
+@media (max-width:600px){
+  .header h3{ font-size:16px }
+  .sidecard{ margin:0 0 14px }
+  .section{ padding:12px }
+  .btn{ padding:9px 12px }
+}
+
+
+/* ====== GUTTERS solo para Control (no afecta al VISOR) ====== */
+:root{
+  --sidecard-w: 295px;   /* ancho del sidecard */
+  --sidecard-pad: 24px;  /* separación al borde */
+  --side-gutter: calc(var(--sidecard-w) + var(--sidecard-pad) + 16px);
+}
+
+/* Aplica SOLO a .app que NO sea .app-visor */
+@media (min-width: 1261px){
+  .app:not(.app-visor){
+    padding-left: var(--side-gutter);
+    padding-right: var(--side-gutter);
+  }
+}
+
+/* Un pelín más de respiro en super‑anchas (opcional) */
+@media (min-width: 1680px){
+  .app:not(.app-visor){
+    padding-left: calc(var(--side-gutter) + 12px);
+    padding-right: calc(var(--side-gutter) + 12px);
+  }
+}
+
+/* ===== Centrado vertical de sidecards en pantallas grandes ===== */
+@media (min-width:1261px){
+  .sidecard{
+    /* top:80px;  ← antes estaba fijo; ahora centramos vertical */
+    top:50%;                        /* ⬅️ NUEVO: centra verticalmente */
+    transform:translateY(-50%);     /* ⬅️ NUEVO: compensa la mitad de su altura */
+  }
+}
+
+/* =========================================================
+   BASE / VARIABLES / RESETEO
+   ========================================================= */
+:root{  
+  --bg:#0f1226; --bg-2:#171a36; --panel:#11142b; --card:#0e1134;
+  --text:#e8ebff; --muted:#a7b0d8; --accent:#7c9eff; --accent-2:#20e3b2; --danger:#ff4976;
+  --teamA:#ff8a00; --teamB:#00d1ff;
+  --radius:16px; --gap:16px; --shadow:0 10px 25px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--text);
+  color-scheme: dark;
+  background: var(--bg);
+}
+
+/* =========================================================
+   LAYOUT GENERAL (COMPARTIDO)
+   ========================================================= */
+.app{
+  max-width:1200px;
+  margin:32px auto;
+  padding:0 16px;
+  display:grid;
+  grid-template-columns:2fr 1.2fr;
+  gap:var(--gap);
+}
+@media (max-width:990px){
+  .app{grid-template-columns:1fr}
+}
+
+.card{
+  background:linear-gradient(180deg,var(--card),var(--panel));
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  position:relative;
+}
+
+.header{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);
+  background:linear-gradient(90deg,rgba(255,255,255,.04),transparent);
+}
+.header h3{margin:0;font-size:18px;letter-spacing:.4px}
+.badge{background:rgba(255,255,255,.08);color:var(--text);padding:6px 10px;border-radius:999px;font-size:12px}
+
+/* =========================================================
+   [VISOR] BLOQUES PRINCIPALES DEL MARCADOR
+   ========================================================= */
+.scoreboard{padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.team{
+  padding:18px;border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+
+  border:1px dashed rgba(255,255,255,.08);
+  display:grid;grid-template-rows:auto 1fr auto;gap:10px
+}
+.team .name{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}
+.team .dot{width:12px;height:12px;border-radius:999px;box-shadow:0 0 0 3px rgba(255,255,255,.06) inset}
+.team.local .dot{background:var(--teamA)} .team.visitante .dot{background:var(--teamB)}
+.score{font-weight:800;font-size:clamp(48px,8vw,82px);line-height:1;text-align:center;margin:6px 0 2px;letter-spacing:1px;text-shadow:0 8px 25px rgba(0,0,0,.35)}
+.substats{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:13px}
+.substats span b{color:var(--text)}
+.center{grid-column:1 / -1;display:grid;gap:12px;padding:10px 12px 2px}
+.timer{display:flex;align-items:center;justify-content:center;gap:10px}
+.time{
+  font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:1px;
+  font-size:clamp(36px,6vw,56px);padding:6px 16px;border-radius:12px;
+  background:linear-gradient(180deg,#121640,#0d1233);border:1px solid rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)
+}
+.pill{
+  font-size:12px;text-transform:uppercase;letter-spacing:.8px;
+  padding:6px 10px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(124,158,255,.25),rgba(124,158,255,.05));
+  border:1px solid rgba(124,158,255,.45);color:#dfe7ff
+}
+.progress{height:10px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.06);position:relative}
+.progress>i{position:absolute;inset:0;width:62%;background:linear-gradient(90deg,var(--accent-2),var(--accent));box-shadow:0 5px 16px rgba(32,227,178,.25)}
+
+/* =========================================================
+   [CONTROL] PANEL DE CONTROL
+   ========================================================= */
+.panel{
+  display:grid;
+  gap:var(--gap);
+  padding:18px;
+  overflow:auto;
+  position:relative;
+  grid-auto-rows:min-content;
+  align-content:start;
+  padding-bottom:12px;
+  scrollbar-gutter: stable both-edges;
+  -webkit-overflow-scrolling: touch;
+}
+.section{
+  border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01))
+}
+.section h4{margin:0 0 10px;font-size:14px;letter-spacing:.6px;text-transform:uppercase;color:#cfd6ff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* “Control General” sticky al fondo */
+.section:last-of-type{
+  position:sticky;
+  bottom:0;
+  z-index:20;
+  margin-top:8px;
+  background: linear-gradient(180deg, rgba(17,20,43,.92), rgba(14,17,52,.96));
+  box-shadow: 0 -8px 24px rgba(0,0,0,.25), 0 0 0 1px rgba(255,255,255,.06) inset;
+  backdrop-filter: blur(4px);
+}
+
+.btn{
+  appearance:none;border:none;cursor:pointer;padding:10px 14px;border-radius:10px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+  color:var(--text);font-weight:600;border:1px solid rgba(255,255,255,.1);
+  transition:.15s transform ease,.15s filter ease,.15s background ease
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn.primary{background:linear-gradient(180deg,var(--accent),#5e7efc)}
+.btn.success{background:linear-gradient(180deg,var(--accent-2),#11caa0)}
+.btn.danger{background:linear-gradient(180deg,#ff6d97,var(--danger))}
+.btn.subtle{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))}
+.pill-mini{padding:6px 10px;border-radius:999px;font-size:12px;background:rgba(255,255,255,.06);color:#d7dcff;border:1px solid rgba(255,255,255,.09)}
+.teamA{border-color:rgba(255,138,0,.4)!important;background:linear-gradient(180deg,#ff8a0022,#ff8a000a)!important}
+.teamB{border-color:rgba(0,209,255,.4)!important;background:linear-gradient(180deg,#00d1ff22,#00d1ff0a)!important}
+
+/* ===== Selects oscuros con flecha ===== */
+.select{ position:relative; display:inline-block; width:100% }
+.sel{
+  appearance:none; -webkit-appearance:none; -moz-appearance:none;
+  min-width:220px;
+  padding:10px 36px 10px 12px;
+  border-radius:10px;
+  color:var(--text);
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+  width:100%; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
+}
+.select::after{
+  content:"▾";
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  pointer-events:none; font-weight:800; color:var(--muted);
+}
+.sel:hover{ filter:brightness(1.05) }
+.sel:focus{
+  outline:none;
+  border-color:rgba(124,158,255,.55);
+  box-shadow:0 0 0 2px rgba(124,158,255,.35);
+}
+.sel:disabled{ opacity:.6; cursor:not-allowed }
+
+/* ===== Toggle sonido ===== */
+.toggle{display:inline-flex;align-items:center;gap:8px}
+.toggle input{display:none}
+.toggle .ui{
+  width:36px;height:20px;border-radius:999px;background:rgba(255,255,255,.15);
+  position:relative;transition:.15s
+}
+.toggle .ui::after{
+  content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.15s
+}
+.toggle input:checked + .ui{background:linear-gradient(180deg,var(--accent-2),var(--accent))}
+.toggle input:checked + .ui::after{left:18px}
+
+/* ===== Decoración ===== */
+.glow{position:absolute;filter:blur(45px);opacity:.35;mix-blend-mode:screen}
+.g1{width:220px;height:220px;background:var(--teamA);top:-60px;left:-60px}
+.g2{width:220px;height:220px;background:var(--teamB);bottom:-60px;right:-60px}
+
+/* =========================================================
+   [VISOR] LATERALES DE FALTAS Y GRID DEL VISOR
+   ========================================================= */
+.app-visor{grid-template-columns:280px 1fr 280px}
+@media (max-width:1100px){.app-visor{grid-template-columns:240px 1fr 240px}}
+@media (max-width:900px){
+  .app-visor{grid-template-columns:1fr}
+  .left{order:1}.center-card{order:2}.right{order:3}
+}
+.side{position:relative}
+.roster{display:grid;gap:10px;padding:14px}
+.foul-item{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.06);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02))
+}
+.foul-item .who{display:flex;align-items:center;gap:10px;min-width:0}
+.avatar{width:28px;height:28px;border-radius:999px;display:grid;place-items:center;font-weight:800;font-size:12px;color:#0b0f2e}
+.avatar.home{background:var(--teamA)} .avatar.away{background:var(--teamB);color:#06283d}
+.name{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.count{font-weight:700;font-size:13px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}
+.count.warn{background:linear-gradient(180deg,#ffd36a33,#ffd36a1a);border-color:#ffd36a66}
+.count.danger{background:linear-gradient(180deg,#ff6d9733,#ff6d971a);border-color:#ff6d9766}
+
+/* =========================================================
+   [CONTROL] Colapsables “Fuera por 5”
+   ========================================================= */
+.collapse {
+  border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:10px 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+}
+.collapse > summary {
+  list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+  font-weight:600; padding:6px 4px; color:var(--text);
+}
+.collapse > summary::-webkit-details-marker { display:none }
+.caret { transition: transform .15s ease }
+.collapse[open] .caret { transform: rotate(180deg) }
+.out-list { list-style:none; margin:8px 0 0; padding:0; display:grid; gap:8px }
+.out-list{
+  max-height: clamp(140px, 28vh, 240px);
+  overflow:auto;
+  padding-right:6px;
+  scroll-behavior:smooth;
+}
+.out-item { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text) }
+.out-item.muted { color: var(--muted) }
+.tag {
+  display:inline-block; min-width:28px; text-align:center; font-weight:800; font-size:12px; padding:4px 8px; border-radius:999px;
+  background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12)
+}
+
+/* =========================================================
+   FIX: estabilizar select “Jugador (dorsal)”
+   ========================================================= */
+.row .select{ flex: 0 0 260px; min-width: 260px; }
+.sel{ width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+html{ scrollbar-gutter: stable both-edges; }
+
+/* =========================================================
+   FIX: títulos fijos en “Fuera por 5”
+   ========================================================= */
+.row.foul-outs{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:16px;
+  width:100%;
+  align-items:flex-start;
+  margin-top:12px;
+}
+.outbox{ width:100%; }
+.outbox > summary{
+  min-height:36px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+
+/* =========================================================
+   Centrar SOLO la vista de Control (no afecta VISOR)
+   ========================================================= */
+.app:not(.app-visor){
+  min-height: 100vh;
+}
+.app:not(.app-visor) > .card{
+  grid-column: 1 / -1;
+  place-self: center;
+}
+
+/* Z-order seguro para header/panel sobre decoraciones */
+.card .header, .card .panel { position: relative; z-index: 2; }
+.card .glow { position: absolute; z-index: 1; }
+
+/* =========================================================
+   LATERALES FIJOS + MODO RESPONSIVO
+   ========================================================= */
+.sidecard{
+  position:fixed;
+  top:80px;
+  width:295px;
+  background:linear-gradient(180deg,var(--card),var(--panel));
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:16px;
+  box-shadow: var(--shadow);
+  padding:12px 12px 14px;
+  z-index:5;
+}
+.sidecard-left{ left:24px; }
+.sidecard-right{ right:24px; }
+
+.sidecard-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 8px 8px; border-bottom:1px solid rgba(255,255,255,.06);
+}
+.sidecard-head h3{ margin:0; font-size:16px; letter-spacing:.4px }
+
+.sidecard-body{ display:grid; gap:10px; padding:10px 4px 0 }
+.field{ display:grid; gap:6px }
+.field.mini{ width:120px }
+.field > span{ font-size:11px; letter-spacing:.6px; color:#cfd6ff }
+.input{
+  height:36px; padding:8px 10px; border-radius:10px;
+  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+  color:var(--text);
+}
+.colorpick{
+  width:100%; height:36px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
+  background:transparent; padding:0;
+}
+.row.between{ justify-content:space-between; gap:10px }
+.btn.block{ width:100% }
+
+.sidecard .shelf{
+  position:absolute; left:50%; transform:translateX(-50%);
+  bottom:-10px; width:85%; height:4px; border-radius:999px;
+  background: rgba(0,0,0,.45); filter: blur(6px); opacity:.8;
+}
+
+/* Ajustes en pantallas muy anchas (suave) */
+@media (max-width: 1400px){
+  .sidecard{ transform: scale(.95); opacity:.98 }
+}
+
+/* ---------- Modo apilado (tablets y móviles) ---------- */
+@media (max-width:1260px){
+  /* Los laterales ya NO son fijos: entran al flujo y se apilan */
+  .sidecard{
+    position:static;
+    width:auto;
+    max-width:860px;
+    margin:0 auto 16px;
+    transform:none;
+    z-index:auto;
+  }
+  .sidecard-left,.sidecard-right{ left:auto; right:auto }
+
+  /* Inputs en dos columnas cuando quepa */
+  .sidecard .row.between{ flex-wrap:wrap }
+  .sidecard .field.mini{ width:calc(50% - 6px) }
+
+  /* El select ocupa todo el ancho cómodo */
+  .sidecard .select{ width:100% }
+}
+
+/* Teléfonos: tipografía y paddings un pelito más compactos */
+@media (max-width:600px){
+  .header h3{ font-size:16px }
+  .sidecard{ margin:0 0 14px }
+  .section{ padding:12px }
+  .btn{ padding:9px 12px }
+}
+
+
+/* ====== GUTTERS solo para Control (no afecta al VISOR) ====== */
+:root{
+  --sidecard-w: 295px;   /* ancho del sidecard */
+  --sidecard-pad: 24px;  /* separación al borde */
+  --side-gutter: calc(var(--sidecard-w) + var(--sidecard-pad) + 16px);
+}
+
+/* Aplica SOLO a .app que NO sea .app-visor */
+@media (min-width: 1261px){
+  .app:not(.app-visor){
+    padding-left: var(--side-gutter);
+    padding-right: var(--side-gutter);
+  }
+}
+
+/* Un pelín más de respiro en super‑anchas (opcional) */
+@media (min-width: 1680px){
+  .app:not(.app-visor){
+    padding-left: calc(var(--side-gutter) + 12px);
+    padding-right: calc(var(--side-gutter) + 12px);
+  }
+}
+
+/* ===== Centrado vertical de sidecards en pantallas grandes ===== */
+@media (min-width:1261px){
+  .sidecard{
+    /* top:80px;  ← antes estaba fijo; ahora centramos vertical */
+    top:50%;                        /* ⬅️ NUEVO: centra verticalmente */
+    transform:translateY(-50%);     /* ⬅️ NUEVO: compensa la mitad de su altura */
+  }
+}
+
+
+
+/* ===== Selects oscuros (unificado, sin duplicados) ===== */
+.select{ position:relative; display:inline-block; width:100% }
+
+/* Aplica a cualquier <select> (incluye los que tienen .sel) */
+:where(select):not([multiple]){
+  appearance:none; -webkit-appearance:none; -moz-appearance:none;
+  display:inline-block;
+  width:100%;
+  min-width:220px;
+  height:42px;
+  padding:10px 40px 10px 12px;        /* espacio para caret */
+  border-radius:12px;
+  color:var(--text);
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+  white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
+
+  /* Caret SVG usando currentColor para poder cambiar con :focus */
+  color:var(--muted);
+  background-image:
+    url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>\
+<polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:14px 14px;
+}
+
+/* Texto del valor visible */
+:where(select):not([multiple]) > option{ color:var(--text); }
+
+/* Hover & focus coherentes con tu UI */
+:where(select):not([multiple]):hover{ filter:brightness(1.05) }
+:where(select):not([multiple]):focus{
+  outline:none;
+  border-color:rgba(124,158,255,.55);
+  box-shadow:0 0 0 2px rgba(124,158,255,.35);
+  color:#cfd6ff; /* cambia el color del caret (currentColor) */
+}
+
+/* Disabled */
+:where(select):not([multiple]):disabled{ opacity:.6; cursor:not-allowed }
+
+/* Menú de opciones en oscuro (compatibilidad amplia) */
+:where(select) option{
+  background:#11142b;
+  color:var(--text);
+}
+
+/* Si usas la clase .sel en HTML, no necesitas estilos aparte:
+   hereda exactamente lo mismo gracias a :where(select) */
