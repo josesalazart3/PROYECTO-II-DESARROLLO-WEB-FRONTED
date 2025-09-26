@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiBase: 'http://localhost:5080'
+  production: WebTransportDatagramDuplexStream,
+  apiBase: 'http://213.199.57.202:5080'
 };
