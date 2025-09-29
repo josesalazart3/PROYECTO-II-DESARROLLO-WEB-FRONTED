@@ -1,5 +1,4 @@
-// environment.ts
 export const environment = {
-  production: false,
+  production: true,
   apiBase: 'http://213.199.57.202:5080'
 };
